@@ -15,7 +15,7 @@ player_list=[]
 
 def print_match(match_list):
     for match in match_list:
-        print(match.name1,match.name2,match.s1,match.s2)
+        print(match.name1,match.name2,match.games_won1,match.games_won2)
 
 def print_players(player_list):
     for player in player_list:
@@ -84,24 +84,29 @@ def build_match_list():
             match=match_class()
             match.name1=char_list[0]
             match.name2=char_list[1]
-            match.s1=int(char_list[2])
-            match.s2=int(char_list[3])
+            match.games_won1=int(char_list[2])
+            match.games_won2=int(char_list[3])
             match_list.append(match)
             player1=find_player(player_list,match.name1)
             player2=find_player(player_list,match.name2)
             if player1==None:
-                last_won_1=0
+                last_won1=0
             else:
-                last_won_1=player1.games_won
-            if player1==None and player2==None:
-                if match.s1==1:
-                    match.winner=player1
-                else:
-                    match.winner=player2
+                last_won1=player1.games_won
+            if player2==None:
+                last_won2=0
+            else:
+                last_won2=player2.games_won
+
+            if last_won1<match.games_won1:
+                match.winner=player1
+            else:
+                match.winner=player2
+            
 
             # check if player is in player_list and add if not present
-            player_update(player_list,match.name1,match.s1,match)
-            player_update(player_list,match.name2,match.s2,match)
+            player_update(player_list,match.name1,match.games_won1,match)
+            player_update(player_list,match.name2,match.games_won2,match)
 
 build_match_list()
 print_match(match_list)
