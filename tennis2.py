@@ -1,9 +1,14 @@
 class match_class:
     def __init__(self):
         print("new match")
+        self.winner=None
 class player_class:
     def __init__(self):
         print("new player")
+        self.name=None
+        self.games_won=None
+        self.games_played=None
+        self.last_match=None
 
 match_list=[]
 player_list=[]
@@ -14,45 +19,48 @@ def print_match(match_list):
 
 def print_players(player_list):
     for player in player_list:
-        print(player.name,player.high_score)
+        print(player.name,"games won",player.games_won,"games played",player.games_played)
 
-# find each players final score
-def final_score():
+# assume total number of players is n (each person plays n-1 games),
+# assuming 2 matches are not played
+#  leading to 2 possible final outcomes:
+# case 1. 3 players (a,b,c), with n-3,n-2,n-2 games 
+# case 2. 4 players (x,y,z,q), each with n-2 games
+# also assuming each player has played at least one game, so the player_list is complete
+def missing_games(player_list):
+    case=2
+    n_players=len(player_list)
     for player in player_list:
-        for match in match_list:
-            if player.name==match.name1:
-                player.high_score=match.s1
-            if player.name==match.name2:
-                player.high_score=match.s2
-    
+        if player.games_played==n_players-3:
+            player_a=player
+            case=1
+        
+    print("case",case)
 
-# add player object to player list
-def player_add(player_list,name):
+def find_player(player_list,name):
+    for player in player_list:
+        if player==player.name:
+            return player
+    return None    
+
+def player_update(player_list,name,games_won,last_match):
     player=None
     for i_player in player_list:
         if name==i_player.name:
-            player=i_player
-            break
-    if player==None:
-        player=player_class()
-        player.name=name
-        player_list.append(player)
-
-def player_add2(player_list,name,high_score):
-    player=None
-    for i_player in player_list:
-        if name==i_player.name:
-            player=i_player
+            player=i_player        
             break
     if player==None:
         # new player inserted
         player=player_class()
         player.name=name 
-        player.high_score=high_score
+        player.games_won=games_won
         player_list.append(player)
+        player.games_played=1
     else:
         # existing player updated with latest score
-        player.high_score=high_score  
+        player.games_won=games_won  
+        player.games_played +=1
+    player.last_match=last_match
 
 def build_match_list():
     file_path="input.txt"
@@ -79,12 +87,23 @@ def build_match_list():
             match.s1=int(char_list[2])
             match.s2=int(char_list[3])
             match_list.append(match)
+            player1=find_player(player_list,match.name1)
+            player2=find_player(player_list,match.name2)
+            if player1==None:
+                last_won_1=0
+            else:
+                last_won_1=player1.games_won
+            if player1==None and player2==None:
+                if match.s1==1:
+                    match.winner=player1
+                else:
+                    match.winner=player2
 
             # check if player is in player_list and add if not present
-            player_add2(player_list,match.name1,match.s1)
-            player_add2(player_list,match.name2,match.s2)
+            player_update(player_list,match.name1,match.s1,match)
+            player_update(player_list,match.name2,match.s2,match)
 
 build_match_list()
 print_match(match_list)
-# final_score()
 print_players(player_list)
+missing_games(player_list)
