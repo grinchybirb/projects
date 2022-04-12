@@ -17,8 +17,8 @@ global i_game
 global line_count
 line_count=0
 
-global err_flg
-err_flg=False 
+global errgap_flg
+errgap_flg=False 
 
 
 
@@ -30,7 +30,7 @@ def game():
     global y_win
     global i_game
     global line_count
-    global err_flg
+    global errgap_flg
     while flag:
         file_line = file_text.readline()
         line_count +=1
@@ -50,10 +50,15 @@ def game():
             x=int(char_list[0])
             y=int(char_list[1])
             print(x,y)
+            if x-x_score>=1 and y-y_score>=1:
+                print("Error: Both players moved up")
+                output_text.writelines("Error at line {}".format(line_count))
+                errgap_flg=True
+                break
             if x-x_score>1:
                 print("Error: X moved up score by more than 1")
                 output_text.writelines("Error at line {}".format(line_count))
-                err_flg=True
+                errgap_flg=True
                 break
             else:
                 x_score=x
@@ -61,41 +66,54 @@ def game():
             if y-y_score>1:
                 print("Error: Y moved up score by more than 1")
                 output_text.writelines("Error at line {}".format(line_count))
-                err_flg=True
+                errgap_flg=True
                 break
             else:
                 y_score=y
 
-            if x==11 and x-y>2:
+            if x_score==11 and x_score-y_score>=2:
                 print("X won game number", i_game+1)
                 x_win +=1
                 break
 
-            if y==11 and y-x>2:
+            if y_score==11 and y_score-x_score>=2:
                 print("Y won game number", i_game+1)             
                 y_win +=1
-                break
+                break    
+
+            if x_score>11 or y_score>11:
+                if x_score-y_score>=2:
+                    print("X won game number", i_game+1)
+                    x_win +=1
+                    break
+
+                if  y_score-x_score>=2:
+                    print("Y won game number", i_game+1)             
+                    y_win +=1
+                    break
+            
     return
 
 
 game_limit=5
-win_limit=2
-for i_game in range(1,game_limit+1):
+win_limit=3
+for i_game in range(game_limit):
     print("\nstarting game:",i_game)
     game()
-    if err_flg is True:
+    if errgap_flg is True:
         break
-    print("x has won:",x_win, "y has won:",y_win)
+    print("x has won:",x_win,"games", "y has won:",y_win,"games")
     
-    if x_win==win_limit:
-        print("X has won by winning", x_win)
-        break
-    if y_win==win_limit:
-        print("Y has won by winning", y_win)
-        break
     
-if err_flg is False:
-    output_text.writelines("Correct")
+if errgap_flg is False:
+    if x_win+y_win==game_limit:
+        if x_win==win_limit:
+            print("X has won by winning", x_win)
+        if y_win==win_limit:
+            print("Y has won by winning", y_win)
+        output_text.writelines("Correct")
+    else:
+        output_text.writelines("Incomplete")
 
 output_text.close()
    

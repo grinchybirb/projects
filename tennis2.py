@@ -14,13 +14,37 @@ match_list=[]
 player_list=[]
 
 def print_match(match_list):
+    print("list of matches")
     for match in match_list:
-        print(match.name1,match.name2,match.games_won1,match.games_won2)
+        print(match.name1,match.name2,match.games_won1,match.games_won2,"winner",match.winner.name)
 
 def print_players(player_list):
+    print("list of players")
     for player in player_list:
         print(player.name,"games won",player.games_won,"games played",player.games_played)
 
+def rankings(match_list,player_list):
+    ranked_list=[]
+    
+    for player in player_list:
+        if len(ranked_list)==0:
+            ranked_list.append(player)
+        else:
+                
+            for i in range(len(ranked_list)):
+                
+                games_won_new=player.games_won
+                games_won_ranked=ranked_list[i].games_won
+                if i+1<len(ranked_list):
+                    games_won_ranked_next=ranked_list[i+1].games_won
+                else:
+                    games_won_ranked_next=0
+                if games_won_new<=games_won_ranked and games_won_new>=games_won_ranked_next:
+                    ranked_list.insert(i+1,player)
+                    break
+                   
+        
+    return ranked_list
 # assume total number of players is n (each person plays n-1 games),
 # assuming 2 matches are not played
 #  leading to 2 possible final outcomes:
@@ -39,7 +63,7 @@ def missing_games(player_list):
 
 def find_player(player_list,name):
     for player in player_list:
-        if player==player.name:
+        if name==player.name:
             return player
     return None    
 
@@ -61,6 +85,7 @@ def player_update(player_list,name,games_won,last_match):
         player.games_won=games_won  
         player.games_played +=1
     player.last_match=last_match
+    return player
 
 def build_match_list():
     file_path="input.txt"
@@ -88,27 +113,33 @@ def build_match_list():
             match.games_won2=int(char_list[3])
             match_list.append(match)
             player1=find_player(player_list,match.name1)
-            player2=find_player(player_list,match.name2)
+            ranked_player=find_player(player_list,match.name2)
             if player1==None:
                 last_won1=0
             else:
                 last_won1=player1.games_won
-            if player2==None:
+            if ranked_player==None:
                 last_won2=0
             else:
-                last_won2=player2.games_won
+                last_won2=ranked_player.games_won
+
+            # check if player is in player_list and add if not present
+            player1=player_update(player_list,match.name1,match.games_won1,match)
+            ranked_player=player_update(player_list,match.name2,match.games_won2,match)
 
             if last_won1<match.games_won1:
                 match.winner=player1
             else:
-                match.winner=player2
+                match.winner=ranked_player
             
 
-            # check if player is in player_list and add if not present
-            player_update(player_list,match.name1,match.games_won1,match)
-            player_update(player_list,match.name2,match.games_won2,match)
+            
 
 build_match_list()
 print_match(match_list)
+print("original list")
 print_players(player_list)
-missing_games(player_list)
+ranking_list=rankings(match_list,player_list)
+print("ranked list")
+print_players(ranking_list)
+# missing_games(player_list)
