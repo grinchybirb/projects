@@ -1,3 +1,10 @@
+# scan matches 
+# built list of match object
+# build list of player objects
+# build a ranked list
+# ToDo: 
+# Error in line "x"
+# Inconsistent matches
 class match_class:
     def __init__(self):
         print("new match")
@@ -23,43 +30,61 @@ def print_players(player_list):
     for player in player_list:
         print(player.name,"games won",player.games_won,"games played",player.games_played)
 
+def compare_players(player_1,player_2,match_list):
+   
+    # compares games_won 
+    if player_1.games_won>player_2.games_won:
+        result=1
+    elif player_1.games_won<player_2.games_won:
+        result=-1
+    else:
+        #  in case of equal games_won look for specific match to get a correct placement
+        found=False
+        for match in match_list:
+            if (match.name1==player_1 and match.name2==player_2) or (match.name2==player_1 and match.name1==player_2):
+                if match.winner==player_1:
+                    result=1
+                else:
+                    result=-1
+                found=True
+                break
+        if found is False:
+            # in case of not finding a match between the two players, default to first player
+            result=1
+    print(player_1.name,player_1.games_won,player_2.name,player_2.games_won,result)
+    return result
+
+
+
 def rankings(match_list,player_list):
     ranked_list=[]
-    
+    # create ranked list by adding from player_list
     for player in player_list:
+        print("inserting",player.name)
         if len(ranked_list)==0:
             ranked_list.append(player)
-        else:
-                
-            for i in range(len(ranked_list)):
-                
-                games_won_new=player.games_won
-                games_won_ranked=ranked_list[i].games_won
+        else: 
+            
+            # new player has more wins than everybody on the list
+            if compare_players(player,ranked_list[0],match_list)==1:
+                ranked_list.insert(0,player)
+                continue
+            if compare_players(player,ranked_list[-1],match_list)==-1:
+                ranked_list.append(player)
+                continue
+            # start a loop and look for insertion point
+            for i in range(len(ranked_list)):      
+                player_ranked=ranked_list[i]        
                 if i+1<len(ranked_list):
-                    games_won_ranked_next=ranked_list[i+1].games_won
-                else:
-                    games_won_ranked_next=0
-                if games_won_new<=games_won_ranked and games_won_new>=games_won_ranked_next:
+                    player_ranked_next=ranked_list[i+1] 
+                
+                # insert player if score is in between the scores of other 2 players
+                if compare_players(player,player_ranked,match_list)==-1 and compare_players(player,player_ranked_next,match_list)==1:
                     ranked_list.insert(i+1,player)
                     break
-                   
+               
         
     return ranked_list
-# assume total number of players is n (each person plays n-1 games),
-# assuming 2 matches are not played
-#  leading to 2 possible final outcomes:
-# case 1. 3 players (a,b,c), with n-3,n-2,n-2 games 
-# case 2. 4 players (x,y,z,q), each with n-2 games
-# also assuming each player has played at least one game, so the player_list is complete
-def missing_games(player_list):
-    case=2
-    n_players=len(player_list)
-    for player in player_list:
-        if player.games_played==n_players-3:
-            player_a=player
-            case=1
-        
-    print("case",case)
 
 def find_player(player_list,name):
     for player in player_list:
@@ -134,12 +159,18 @@ def build_match_list():
             
 
             
-
+# main 
 build_match_list()
 print_match(match_list)
 print("original list")
 print_players(player_list)
+
 ranking_list=rankings(match_list,player_list)
 print("ranked list")
 print_players(ranking_list)
-# missing_games(player_list)
+
+output_path = 'output.txt'
+output_text = open(output_path, "w")
+for player in ranking_list:
+    output_text.writelines(player.name+" ")
+output_text.close()

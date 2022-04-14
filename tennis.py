@@ -1,3 +1,4 @@
+# run loop over games, check for correctness, and display results
 # input values
 file_path = 'input.txt'
 file_text = open(file_path, "r")
@@ -97,6 +98,7 @@ def game():
 
 game_limit=5
 win_limit=3
+# run loop over amount of games played
 for i_game in range(game_limit):
     print("\nstarting game:",i_game)
     game()
@@ -104,7 +106,7 @@ for i_game in range(game_limit):
         break
     print("x has won:",x_win,"games", "y has won:",y_win,"games")
     
-    
+# post status
 if errgap_flg is False:
     if x_win+y_win==game_limit:
         if x_win==win_limit:
@@ -116,6 +118,4 @@ if errgap_flg is False:
         output_text.writelines("Incomplete")
 
 output_text.close()
-   
-
 file_text.close()
