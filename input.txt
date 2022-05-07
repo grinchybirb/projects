@@ -5,4 +5,5 @@ John Math 94
 
 Lev Eng 95
 Lev Math 98
-Lev SocialStudies 90
+John Math 98
+Lev Eng 93

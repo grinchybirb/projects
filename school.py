@@ -1,29 +1,26 @@
 class student_class:
-    def __init__(self) -> None:
+    def __init__(self,name) -> None:
         print("new person added")
-        self.name=None
-        self.grade_total=0
-        self.semesters=0
-        self.average=0
+        self.name=name
+        self.subject_dict={}
         return
     
     def print(self):
-        self.average=self.grade_total/self.semesters
-        print(self.name,self.average,self.semesters,self.grade_total)
+        print("=====",self.name)
+        for temp in self.subject_dict:
+            print(temp,self.subject_dict[temp].grade_total/self.subject_dict[temp].count)
         return
 
-class sub_class:
-    def __init__(self) -> None:
-        self.name=None
-        self.grade_total=0
-        self.semesters=0
-        self.average=0
+class std_sub_class:
+    def __init__(self,grade_total,count) -> None:
+        self.grade_total=grade_total
+        self.count=count
+
+
+
         return
-        
-    def print(self):
-        self.average=self.grade_total/self.semesters
-        print(self.name,self.average,self.semesters,self.grade_total)
-        return
+
+
 
 
 def read_file():
@@ -42,42 +39,43 @@ def read_file():
         grade=int(tokens[2])
         print(name,subject,grade)
         # check if student is new
+
         student_found=False
         for student in student_list:
             if student.name==name:
                 student_found=True
-                student.semesters +=1
-                student.grade_total+=grade
+                # look for subject in the student dictionary of subjects
+
+                if subject  in student.subject_dict:
+                    # updating existing std_sub
+                    student.subject_dict[subject].grade_total +=grade
+                    student.subject_dict[subject].count +=1
+                   
+
+                else:
+                    # new std_sub
+                    std_sub=std_sub_class(grade,1)
+                    student.subject_dict[subject]=std_sub
+
                 break
         
         if student_found==False:
-            student=student_class()
-            student.name=name
-            student.grade_total=grade
-            student.semesters=1
+            
+            # new std_sub
+            std_sub=std_sub_class(grade,1)
+
+            # new student
+            student=student_class(name)
+            student.subject_dict[subject]=std_sub
+            # add new student to the list
             student_list.append(student)
 
         # check if subject is new
-        sub_found=False
-        for sub in sub_list:
-            if sub.name==subject:
-                sub_found=True
-                sub.semesters +=1
-                sub.grade_total +=grade
-                break
-
-        if sub_found==False:
-            sub=sub_class()
-            sub.name=subject
-            sub.grade_total=grade
-            sub.semesters=1
-            sub_list.append(sub)
 
             
   
     file_text.close()
     for student in student_list:
         student.print()
-    for sub in sub_list:
-        sub.print()
+
 read_file()
